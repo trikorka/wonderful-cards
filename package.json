@@ -1,6 +1,6 @@
 {
   "name": "wonderful-cards",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Magic item cards for D&D in Obsidian",
   "main": "main.js",
   "scripts": {
