@@ -1,9 +1,9 @@
-/* в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ
-   Wonderful Cards вЂ” Card Styles
+/* ═══════════════════════════════════════
+   Wonderful Cards — Card Styles
    Obsidian-native D&D item card design
-   в•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђв•ђ */
+   ═══════════════════════════════════════ */
 
-/* в”Ђв”Ђ Card container в”Ђв”Ђ */
+/* ── Card container ── */
 .wc-card {
     min-width: 400px;
     margin: var(--size-4-6) auto;
@@ -27,7 +27,7 @@
     transform: translateY(-1px);
 }
 
-/* в•ђв•ђв•ђ Accent bar вЂ” rarity colors в•ђв•ђв•ђ */
+/* ═══ Accent bar — rarity colors ═══ */
 .wc-card-accent {
     height: 5px;
     flex-shrink: 0;
@@ -41,7 +41,7 @@
 .wc-rarity--legendary .wc-card-accent{ background: #fbbf24; }
 .wc-rarity--artifact .wc-card-accent { background: #f87171; }
 
-/* в•ђв•ђв•ђ Meta line вЂ” rarity-colored text в•ђв•ђв•ђ */
+/* ═══ Meta line — rarity-colored text ═══ */
 .wc-rarity--default .wc-card-meta  { color: #a78bfa; }
 .wc-rarity--common .wc-card-meta   { color: #9ca3af; }
 .wc-rarity--uncommon .wc-card-meta { color: #34d399; }
@@ -50,7 +50,7 @@
 .wc-rarity--legendary .wc-card-meta{ color: #fbbf24; }
 .wc-rarity--artifact .wc-card-meta { color: #f87171; }
 
-/* в•ђв•ђв•ђ Catalog Sidebar View в•ђв•ђв•ђ */
+/* ═══ Catalog Sidebar View ═══ */
 .wc-catalog-container { padding: 10px; display: flex; flex-direction: column; height: 100%; }
 .wc-catalog-header { margin-bottom: 15px; }
 .wc-catalog-header h3 { margin: 0 0 10px 0; }
@@ -70,12 +70,12 @@
 .wc-catalog-mini-card-wrap .wc-card-header-row { padding: 10px 12px 2px; }
 .wc-catalog-mini-card-wrap .wc-card-meta { padding: 0 12px 8px; }
 
-/* в•ђв•ђв•ђ Preview Sidebar View в•ђв•ђв•ђ */
+/* ═══ Preview Sidebar View ═══ */
 .wc-preview-container { padding: 10px; display: flex; flex-direction: column; height: 100%; overflow-y: auto; }
 .wc-preview-back-btn { margin-bottom: 15px; align-self: flex-start; }
 .wc-preview-card-wrap .wc-card { min-width: 0; margin: 0 auto; }
 
-/* в•ђв•ђв•ђ Edit Modal в•ђв•ђв•ђ */
+/* ═══ Edit Modal ═══ */
 .wc-edit-modal { width: 600px; max-width: 90vw; }
 .wc-edit-mode-toggle { display: flex; gap: 10px; margin-bottom: 20px; }
 .wc-edit-mode-btn { padding: 4px 12px; background: var(--background-primary); border: 1px solid var(--background-modifier-border); border-radius: 4px; cursor: pointer; }
@@ -84,7 +84,7 @@
 .wc-edit-yaml-area { width: 100%; font-family: var(--font-monospace); }
 .wc-edit-textarea { width: 100%; }
 
-/* в•ђв•ђв•ђ Header row: title left, price right в•ђв•ђв•ђ */
+/* ═══ Header row: title left, price right ═══ */
 .wc-card-header-row {
     display: flex;
     align-items: flex-start;
@@ -114,7 +114,7 @@
     margin-top: 2px;
 }
 
-/* в•ђв•ђв•ђ Price badge в•ђв•ђв•ђ */
+/* ═══ Price badge ═══ */
 .wc-card-price-badge {
     flex-shrink: 0;
     padding: 4px 12px;
@@ -126,35 +126,35 @@
     margin-top: 4px;
 }
 
-/* Gold (Р—Рњ) вЂ” pale yellow */
+/* Gold (ЗМ) — pale yellow */
 .wc-price--gold {
     background: rgba(250, 204, 21, 0.15);
     color: #ca8a04;
     border: 1px solid rgba(250, 204, 21, 0.35);
 }
 
-/* Silver (РЎРњ) */
+/* Silver (СМ) */
 .wc-price--silver {
     background: rgba(148, 163, 184, 0.15);
     color: #94a3b8;
     border: 1px solid rgba(148, 163, 184, 0.3);
 }
 
-/* Copper (РњРњ) вЂ” paler */
+/* Copper (ММ) — paler */
 .wc-price--copper {
     background: rgba(194, 120, 62, 0.12);
     color: #c2783e;
     border: 1px solid rgba(194, 120, 62, 0.25);
 }
 
-/* Electrum (Р­Рњ) */
+/* Electrum (ЭМ) */
 .wc-price--electrum {
     background: rgba(163, 163, 163, 0.15);
     color: #a3a3a3;
     border: 1px solid rgba(163, 163, 163, 0.3);
 }
 
-/* в•ђв•ђв•ђ Meta line в•ђв•ђв•ђ */
+/* ═══ Meta line ═══ */
 .wc-card-meta {
     padding: 0 20px 12px;
     font-size: 0.85em;
@@ -163,7 +163,7 @@
     line-height: 1.4;
 }
 
-/* в•ђв•ђв•ђ Decorative divider в•ђв•ђв•ђ */
+/* ═══ Decorative divider ═══ */
 .wc-card-divider {
     display: flex;
     align-items: center;
@@ -186,7 +186,7 @@
     background: linear-gradient(90deg, var(--background-modifier-border-focus), transparent);
 }
 
-/* в•ђв•ђв•ђ Image вЂ” clean, no border в•ђв•ђв•ђ */
+/* ═══ Image — clean, no border ═══ */
 .wc-card-image {
     padding: 0 20px;
     margin-bottom: 16px;
@@ -209,7 +209,7 @@
     border-radius: 0;
 }
 
-/* в•ђв•ђв•ђ Description вЂ” full width, fills to bottom в•ђв•ђв•ђ */
+/* ═══ Description — full width, fills to bottom ═══ */
 .wc-card-description {
     position: relative;
     margin: 0;
