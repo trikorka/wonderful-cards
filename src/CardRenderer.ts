@@ -1,4 +1,4 @@
-import { App, parseYaml, MarkdownRenderer, Component, Notice } from 'obsidian';
+import { App, parseYaml, MarkdownRenderer, Component, Notice, setIcon } from 'obsidian';
 import type { MagicItem } from './types';
 
 function getRarityClass(rarity?: string): string {
@@ -24,10 +24,11 @@ function getPriceCurrencyClass(price?: string): string {
 }
 
 export interface CardRenderOptions {
-    onAddToCatalog?: (item: MagicItem, yaml: string) => void;
-    onRemoveFromCatalog?: (item: MagicItem) => void;
+    onAddToCatalog?: (item: MagicItem, yaml: string) => Promise<void>;
+    onRemoveFromCatalog?: (item: MagicItem) => Promise<void>;
     isInCatalog?: boolean;
     compact?: boolean;
+    onCardClick?: (item: MagicItem) => void;
 }
 
 export class CardRenderer {
@@ -41,8 +42,8 @@ export class CardRenderer {
     ) {
         let item: MagicItem;
         try {
-            item = parseYaml(source);
-        } catch (e) {
+            item = parseYaml(source) as MagicItem;
+        } catch {
             el.createEl('div', { text: 'Ошибка парсинга YAML карточки предмета.', cls: 'wc-card-error' });
             return;
         }
@@ -55,14 +56,14 @@ export class CardRenderer {
         // Width
         if (!options?.compact) {
             const width = item.width && item.width >= 400 ? item.width : 400;
-            card.style.width = `${width}px`;
-            card.style.maxWidth = '100%';
+            card.style.setProperty('width', `${width}px`);
+            card.style.setProperty('max-width', '100%');
         }
 
         // Click handler
         if (options?.onCardClick) {
-            card.style.cursor = 'pointer';
-            card.addEventListener('click', (e) => {
+            card.style.setProperty('cursor', 'pointer');
+            card.addEventListener('click', () => {
                 options.onCardClick!(item);
             });
         }
@@ -80,39 +81,42 @@ export class CardRenderer {
             });
 
             const renderIcon = (isAdded: boolean) => {
+                addBtn.empty();
                 if (isAdded) {
-                    addBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>';
+                    setIcon(addBtn, 'check');
                 } else {
-                    addBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path><line x1="12" y1="7" x2="12" y2="13"></line><line x1="9" y1="10" x2="15" y2="10"></line></svg>';
+                    setIcon(addBtn, 'plus');
                 }
             };
 
             let isAdded = !!options.isInCatalog;
             renderIcon(isAdded);
 
-            addBtn.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                if (isAdded && options.onRemoveFromCatalog) {
-                    await options.onRemoveFromCatalog(item);
-                    isAdded = false;
-                    addBtn.classList.remove('wc-block-action-btn--added');
-                    addBtn.setAttribute('aria-label', 'Добавить в каталог');
-                    renderIcon(isAdded);
-                    new Notice(`«${item.name}» удалена из каталога`);
-                } else if (!isAdded && options.onAddToCatalog) {
-                    await options.onAddToCatalog(item, source);
-                    isAdded = true;
-                    addBtn.classList.add('wc-block-action-btn--added');
-                    addBtn.setAttribute('aria-label', 'Удалить из каталога');
-                    renderIcon(isAdded);
-                    new Notice(`«${item.name}» добавлена в каталог`);
-                }
+            addBtn.addEventListener('click', (e) => {
+                void (async () => {
+                    e.stopPropagation();
+                    if (isAdded && options.onRemoveFromCatalog) {
+                        await options.onRemoveFromCatalog(item);
+                        isAdded = false;
+                        addBtn.classList.remove('wc-block-action-btn--added');
+                        addBtn.setAttribute('aria-label', 'Добавить в каталог');
+                        renderIcon(isAdded);
+                        new Notice(`«${item.name}» удалена из каталога`);
+                    } else if (!isAdded && options.onAddToCatalog) {
+                        await options.onAddToCatalog(item, source);
+                        isAdded = true;
+                        addBtn.classList.add('wc-block-action-btn--added');
+                        addBtn.setAttribute('aria-label', 'Удалить из каталога');
+                        renderIcon(isAdded);
+                        new Notice(`«${item.name}» добавлена в каталог`);
+                    }
+                })();
             });
         }
 
         // Click handler
         if (options?.onCardClick) {
-            card.style.cursor = 'pointer';
+            card.style.setProperty('cursor', 'pointer');
             card.addEventListener('click', (e) => {
                 if ((e.target as HTMLElement).closest('.wc-card-action-btn')) return;
                 options.onCardClick!(item);

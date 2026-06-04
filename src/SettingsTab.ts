@@ -1,7 +1,6 @@
 import { PluginSettingTab, App, Setting, Notice } from 'obsidian';
 import type WonderfulCardsPlugin from './main';
 import { CardEditModal } from './CardEditModal';
-import type { CatalogItem } from './types';
 
 export class WonderfulCardsSettingsTab extends PluginSettingTab {
     plugin: WonderfulCardsPlugin;
@@ -15,7 +14,9 @@ export class WonderfulCardsSettingsTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        containerEl.createEl('h2', { text: 'Wonderful Cards — Каталог' });
+        new Setting(containerEl)
+            .setName('Wonderful Cards — Каталог')
+            .setHeading();
 
         // Add button
         new Setting(containerEl)
@@ -25,11 +26,13 @@ export class WonderfulCardsSettingsTab extends PluginSettingTab {
                 .setButtonText('+ Добавить')
                 .setCta()
                 .onClick(() => {
-                    new CardEditModal(this.app, this.plugin, null, async (item, yaml) => {
-                        await this.plugin.catalogStore.add(item, yaml);
-                        new Notice(`«${item.name}» добавлена в каталог`);
-                        this.display();
-                    }).open();
+                    void (async () => {
+                        new CardEditModal(this.app, this.plugin, null, async (item, yaml) => {
+                            await this.plugin.catalogStore.add(item, yaml);
+                            new Notice(`«${item.name}» добавлена в каталог`);
+                            this.display();
+                        }).open();
+                    })();
                 }));
 
         // Separator
@@ -54,20 +57,24 @@ export class WonderfulCardsSettingsTab extends PluginSettingTab {
             s.addButton(btn => btn
                 .setButtonText('Редактировать')
                 .onClick(() => {
-                    new CardEditModal(this.app, this.plugin, entry, async (item, yaml) => {
-                        await this.plugin.catalogStore.update(entry.id, item, yaml);
-                        new Notice(`«${item.name}» обновлена`);
-                        this.display();
-                    }).open();
+                    void (async () => {
+                        new CardEditModal(this.app, this.plugin, entry, async (item, yaml) => {
+                            await this.plugin.catalogStore.update(entry.id, item, yaml);
+                            new Notice(`«${item.name}» обновлена`);
+                            this.display();
+                        }).open();
+                    })();
                 }));
 
             s.addButton(btn => btn
                 .setButtonText('Удалить')
-                .setWarning()
-                .onClick(async () => {
-                    await this.plugin.catalogStore.remove(entry.id);
-                    new Notice(`«${entry.item.name}» удалена из каталога`);
-                    this.display();
+                .setDestructive()
+                .onClick(() => {
+                    void (async () => {
+                        await this.plugin.catalogStore.remove(entry.id);
+                        new Notice(`«${entry.item.name}» удалена из каталога`);
+                        this.display();
+                    })();
                 }));
         }
     }

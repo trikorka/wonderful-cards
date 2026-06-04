@@ -52,7 +52,7 @@ export class CardPreviewView extends ItemView {
                 text: '← Назад к каталогу'
             });
             backBtn.addEventListener('click', () => {
-                this.plugin.openCatalog();
+                void this.plugin.openCatalog();
             });
         }
 

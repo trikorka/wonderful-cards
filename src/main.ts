@@ -1,10 +1,10 @@
-import { Plugin, WorkspaceLeaf } from 'obsidian';
+import { Plugin, Notice } from 'obsidian';
 import { CardRenderer } from './CardRenderer';
 import { CatalogStore } from './CatalogStore';
 import { CatalogView, VIEW_TYPE_CATALOG } from './CatalogView';
 import { CardPreviewView, VIEW_TYPE_CARD_PREVIEW } from './CardPreviewView';
 import { WonderfulCardsSettingsTab } from './SettingsTab';
-import type { CatalogItem } from './types';
+import type { CatalogItem, MagicItem } from './types';
 
 export default class WonderfulCardsPlugin extends Plugin {
     catalogStore: CatalogStore;
@@ -23,24 +23,24 @@ export default class WonderfulCardsPlugin extends Plugin {
             const itemName = itemMatch ? itemMatch[1].trim() : '';
             const isInCatalog = this.catalogStore.has(itemName);
 
-            CardRenderer.render(this.app, source, el, ctx.sourcePath, this, {
+            void CardRenderer.render(this.app, source, el, ctx.sourcePath, this, {
                 isInCatalog,
-                onAddToCatalog: async (item, yaml) => {
+                onAddToCatalog: async (item: MagicItem, yaml: string) => {
                     await this.catalogStore.add(item, yaml);
                 },
-                onRemoveFromCatalog: async (item) => {
+                onRemoveFromCatalog: async (item: MagicItem) => {
                     const c = this.catalogStore.findByName(item.name);
                     if (c) {
                         await this.catalogStore.remove(c.id);
                     }
                 },
-                onCardClick: (item) => {
+                onCardClick: (item: MagicItem) => {
                     const entry = this.catalogStore.findByName(item.name);
                     if (entry) {
-                        this.openCardPreview(entry);
+                        void this.openCardPreview(entry);
                     } else {
                         // If not in catalog, create a temporary entry for preview
-                        this.openCardPreview({ id: 'temp', item, sourceYaml: source });
+                        void this.openCardPreview({ id: 'temp', item, sourceYaml: source });
                     }
                 }
             });
@@ -69,9 +69,9 @@ description: |
         });
 
         this.addCommand({
-            id: 'open-wonderful-cards-catalog',
+            id: 'open-catalog',
             name: 'Открыть каталог карточек',
-            callback: () => this.openCatalog()
+            callback: () => { void this.openCatalog(); }
         });
 
         // Style `wc:Название` inline code in Reading Mode
@@ -84,14 +84,14 @@ description: |
         });
 
         // Register global click handler for inline code and links
-        this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
+        this.registerDomEvent(activeDocument, 'click', (evt: MouseEvent) => {
             const target = evt.target as HTMLElement;
             
             // Helper to open preview
             const triggerPreview = (itemName: string) => {
                 const entry = this.catalogStore.findByName(itemName);
                 if (entry) {
-                    this.openCardPreview(entry);
+                    void this.openCardPreview(entry);
                 } else {
                     new Notice(`Карточка «${itemName}» не найдена в каталоге`);
                 }

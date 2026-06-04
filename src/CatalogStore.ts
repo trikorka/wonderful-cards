@@ -1,4 +1,4 @@
-import { parseYaml, stringifyYaml } from 'obsidian';
+import { parseYaml } from 'obsidian';
 import type { MagicItem, CatalogItem, PluginData } from './types';
 import type WonderfulCardsPlugin from './main';
 
@@ -16,8 +16,8 @@ export class CatalogStore {
     }
 
     async load(): Promise<void> {
-        const saved = await this.plugin.loadData();
-        if (saved && saved.catalog) {
+        const saved = await this.plugin.loadData() as Partial<PluginData> | null;
+        if (saved?.catalog) {
             this.data = saved as PluginData;
         }
     }

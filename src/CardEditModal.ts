@@ -147,7 +147,7 @@ export class CardEditModal extends Modal {
     }
 
     private syncItemToYaml() {
-        const obj: Record<string, any> = {};
+        const obj: Record<string, unknown> = {};
         if (this.item.name) obj.name = this.item.name;
         if (this.item.title_en) obj.title_en = this.item.title_en;
         if (this.item.image) obj.image = this.item.image;
@@ -167,7 +167,7 @@ export class CardEditModal extends Modal {
             if (parsed) {
                 this.item = { ...this.item, ...parsed };
             }
-        } catch (e) {
+        } catch {
             new Notice('Ошибка парсинга YAML');
         }
     }

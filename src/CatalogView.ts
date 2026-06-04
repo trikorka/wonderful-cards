@@ -1,7 +1,6 @@
 import { ItemView, WorkspaceLeaf, Component } from 'obsidian';
 import type WonderfulCardsPlugin from './main';
 import { CardRenderer } from './CardRenderer';
-import type { CatalogItem } from './types';
 
 export const VIEW_TYPE_CATALOG = 'wc-catalog-view';
 
@@ -22,7 +21,7 @@ export class CatalogView extends ItemView {
 
     async onOpen() {
         this.component.load();
-        this.renderView();
+        void this.renderView();
     }
 
     async onClose() {
@@ -47,7 +46,7 @@ export class CatalogView extends ItemView {
         searchInput.value = this.searchQuery;
         searchInput.addEventListener('input', () => {
             this.searchQuery = searchInput.value;
-            this.renderGrid(grid);
+            void this.renderGrid(grid);
         });
 
         // Grid
@@ -78,7 +77,7 @@ export class CatalogView extends ItemView {
                 {
                     compact: true,
                     onCardClick: () => {
-                        this.plugin.openCardPreview(entry, true);
+                        void this.plugin.openCardPreview(entry, true);
                     }
                 }
             );
