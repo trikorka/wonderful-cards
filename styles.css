@@ -65,7 +65,7 @@
 }
 .wc-catalog-mini-card-wrap:hover { transform: translateX(2px); }
 .wc-catalog-mini-card-wrap .wc-card {
-    min-width: 0; width: 100% !important; margin: 0;
+    min-width: 0; width: 100%; margin: 0;
 }
 .wc-catalog-mini-card-wrap .wc-card-header-row { padding: 10px 12px 2px; }
 .wc-catalog-mini-card-wrap .wc-card-meta { padding: 0 12px 8px; }
@@ -235,7 +235,6 @@
 
 .wc-card-description p {
     margin: 0 0 12px;
-    text-indent: 1.5em;
 }
 
 .wc-card-description p:last-child {
