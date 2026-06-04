@@ -5,22 +5,47 @@ Wonderful Cards is an Obsidian plugin that allows you to create and display beau
 ## Features
 
 - **Beautiful D&D Cards:** Render rich, themed cards for magic items.
-- **Easy Syntax:** Use simple code blocks in Obsidian to define your items.
-- **Customizable:** Designed to fit perfectly within Obsidian's aesthetic while providing that classic D&D feel.
+- **Easy Syntax:** Use simple `itemcard` YAML code blocks in Obsidian to define your items.
+- **Customizable:** Fully customizable card data including images, price, rarity, and descriptions.
+- **Catalog System:** Save and manage all your magic items in a global catalog.
+- **Inline References:** Quickly preview cards in any note using the `wc:Item Name` syntax or by clicking internal links.
 
 ## How to use
 
-In any Obsidian note, create a `magic-item` code block and fill it with the item's details.
+In any Obsidian note, create an `itemcard` code block and fill it with the item's details in YAML format. You can also use the "Вставить шаблон магического предмета" (Insert magic item template) command to quickly insert a blank card.
 
 ### Example
 
 ````markdown
-```magic-item
-name: Staff of Power
-type: Staff, very rare (requires attunement by a sorcerer, warlock, or wizard)
-description: This staff can be wielded as a magic quarterstaff that grants a +2 bonus to attack and damage rolls made with it. While holding it, you gain a +2 bonus to Armor Class, saving throws, and spell attack rolls.
+```itemcard
+name: "Посох Мощи"
+title_en: "Staff of Power"
+image: "https://example.com/staff.png"
+type: "Посох"
+subtype: "Магическое оружие"
+rarity: "Очень редкий"
+attunement: "колдуном, чародеем или волшебником"
+price: "5000 зм"
+text_align: "ширина"
+description: |
+  Этот посох можно использовать как магический боевой посох, дающий бонус +2 к броскам атаки и урона.
+  
+  Пока вы держите его, вы получаете бонус +2 к КД, спасброскам и броскам атаки заклинаниями.
 ```
 ````
+
+### Supported Fields
+
+- `name`: (Required) The name of the item.
+- `title_en`: (Optional) The original English name.
+- `image`: (Optional) URL or Obsidian internal link to an image (e.g., `image.png` or `https://...`).
+- `type`: (Optional) Item type (default: "Чудесный предмет").
+- `subtype`: (Optional) Item subtype.
+- `rarity`: (Optional) Item rarity (e.g., обычный, необычный, редкий, очень редкий, легендарный, артефакт).
+- `attunement`: (Optional) Boolean (`true`/`false`) or string (e.g., "требуется настройка бардом").
+- `price`: (Optional) Price with currency (e.g., "500 зм", "10 см", "5 мм").
+- `text_align`: (Optional) Text alignment for the description (`left`, `center`, `right`, `justify` / `ширина`).
+- `description`: (Optional) Multiline Markdown description of the item.
 
 ## Installation
 
