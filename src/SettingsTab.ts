@@ -11,6 +11,10 @@ export class WonderfulCardsSettingsTab extends PluginSettingTab {
     }
 
     display(): void {
+        this.renderSettings();
+    }
+
+    private renderSettings(): void {
         const { containerEl } = this;
         containerEl.empty();
 
@@ -30,7 +34,7 @@ export class WonderfulCardsSettingsTab extends PluginSettingTab {
                         void (async () => {
                             await this.plugin.catalogStore.add(item, yaml);
                             new Notice(`«${item.name}» добавлена в каталог`);
-                            this.display();
+                            this.renderSettings();
                         })();
                     }).open();
                 }));
@@ -61,19 +65,19 @@ export class WonderfulCardsSettingsTab extends PluginSettingTab {
                         void (async () => {
                             await this.plugin.catalogStore.update(entry.id, item, yaml);
                             new Notice(`«${item.name}» обновлена`);
-                            this.display();
+                            this.renderSettings();
                         })();
                     }).open();
                 }));
 
             s.addButton(btn => btn
                 .setButtonText('Удалить')
-                .setWarning()
+                .setDestructive()
                 .onClick(() => {
                     void (async () => {
                         await this.plugin.catalogStore.remove(entry.id);
                         new Notice(`«${entry.item.name}» удалена из каталога`);
-                        this.display();
+                        this.renderSettings();
                     })();
                 }));
         }
