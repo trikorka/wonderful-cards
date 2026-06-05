@@ -15,7 +15,7 @@ export class WonderfulCardsSettingsTab extends PluginSettingTab {
         containerEl.empty();
 
         new Setting(containerEl)
-            .setName('Wonderful Cards — Каталог')
+            .setName('Каталог')
             .setHeading();
 
         // Add button
@@ -26,13 +26,13 @@ export class WonderfulCardsSettingsTab extends PluginSettingTab {
                 .setButtonText('+ Добавить')
                 .setCta()
                 .onClick(() => {
-                    void (async () => {
-                        new CardEditModal(this.app, this.plugin, null, async (item, yaml) => {
+                    new CardEditModal(this.app, this.plugin, null, (item, yaml) => {
+                        void (async () => {
                             await this.plugin.catalogStore.add(item, yaml);
                             new Notice(`«${item.name}» добавлена в каталог`);
                             this.display();
-                        }).open();
-                    })();
+                        })();
+                    }).open();
                 }));
 
         // Separator
@@ -57,18 +57,18 @@ export class WonderfulCardsSettingsTab extends PluginSettingTab {
             s.addButton(btn => btn
                 .setButtonText('Редактировать')
                 .onClick(() => {
-                    void (async () => {
-                        new CardEditModal(this.app, this.plugin, entry, async (item, yaml) => {
+                    new CardEditModal(this.app, this.plugin, entry, (item, yaml) => {
+                        void (async () => {
                             await this.plugin.catalogStore.update(entry.id, item, yaml);
                             new Notice(`«${item.name}» обновлена`);
                             this.display();
-                        }).open();
-                    })();
+                        })();
+                    }).open();
                 }));
 
             s.addButton(btn => btn
                 .setButtonText('Удалить')
-                .setDestructive()
+                .setWarning()
                 .onClick(() => {
                     void (async () => {
                         await this.plugin.catalogStore.remove(entry.id);

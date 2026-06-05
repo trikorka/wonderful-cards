@@ -20,6 +20,15 @@
     flex-direction: column;
 }
 
+.wc-card--custom-width {
+    width: var(--wc-card-width, 400px);
+    max-width: 100%;
+}
+
+.wc-card--clickable {
+    cursor: pointer;
+}
+
 .wc-card:hover {
     box-shadow:
         0 8px 24px rgba(0, 0, 0, 0.12),

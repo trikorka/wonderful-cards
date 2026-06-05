@@ -56,14 +56,15 @@ export class CardRenderer {
         // Width
         if (!options?.compact) {
             const width = item.width && item.width >= 400 ? item.width : 400;
-            card.style.setProperty('width', `${width}px`);
-            card.style.setProperty('max-width', '100%');
+            card.setCssProps({ '--wc-card-width': `${width}px` });
+            card.addClass('wc-card--custom-width');
         }
 
         // Click handler
         if (options?.onCardClick) {
-            card.style.setProperty('cursor', 'pointer');
-            card.addEventListener('click', () => {
+            card.addClass('wc-card--clickable');
+            card.addEventListener('click', (e) => {
+                if ((e.target as HTMLElement).closest('.wc-block-action-btn')) return;
                 options.onCardClick!(item);
             });
         }
@@ -114,14 +115,6 @@ export class CardRenderer {
             });
         }
 
-        // Click handler
-        if (options?.onCardClick) {
-            card.style.setProperty('cursor', 'pointer');
-            card.addEventListener('click', (e) => {
-                if ((e.target as HTMLElement).closest('.wc-card-action-btn')) return;
-                options.onCardClick!(item);
-            });
-        }
 
         // Top accent bar
         card.createEl('div', { cls: 'wc-card-accent' });

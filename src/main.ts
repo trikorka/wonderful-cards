@@ -163,7 +163,7 @@ description: |
                 return; // Fallback if no right leaf is available
             }
         }
-        this.app.workspace.revealLeaf(leaf);
+        await this.app.workspace.revealLeaf(leaf);
     }
 
     async openCardPreview(entry: CatalogItem, fromCatalog: boolean = false) {
@@ -177,9 +177,9 @@ description: |
                  return;
              }
         }
-        this.app.workspace.revealLeaf(leaf);
+        await this.app.workspace.revealLeaf(leaf);
         if (leaf.view instanceof CardPreviewView) {
-            leaf.view.showCard(entry, fromCatalog);
+            await leaf.view.showCard(entry, fromCatalog);
         }
     }
 }
