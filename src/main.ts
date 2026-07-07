@@ -5,6 +5,7 @@ import { CatalogView, VIEW_TYPE_CATALOG } from './CatalogView';
 import { CardPreviewView, VIEW_TYPE_CARD_PREVIEW } from './CardPreviewView';
 import { WonderfulCardsSettingsTab } from './SettingsTab';
 import type { CatalogItem, MagicItem } from './types';
+import { t, setLang } from './i18n';
 
 export default class WonderfulCardsPlugin extends Plugin {
     catalogStore: CatalogStore;
@@ -12,6 +13,9 @@ export default class WonderfulCardsPlugin extends Plugin {
     async onload() {
         this.catalogStore = new CatalogStore(this);
         await this.catalogStore.load();
+
+        // Initialize language from saved settings
+        setLang(this.catalogStore.getLang());
 
         this.registerView(VIEW_TYPE_CATALOG, (leaf) => new CatalogView(leaf, this));
         this.registerView(VIEW_TYPE_CARD_PREVIEW, (leaf) => new CardPreviewView(leaf, this));
@@ -48,18 +52,18 @@ export default class WonderfulCardsPlugin extends Plugin {
 
         this.addCommand({
             id: 'insert-magic-item-template',
-            name: 'Вставить шаблон магического предмета',
-            editorCallback: (editor, view) => {
+            name: t('cmd.insert-template'),
+            editorCallback: (editor) => {
                 const template = `\`\`\`itemcard
 name: ""
 title_en: ""
 image: ""
-type: "Чудесный предмет"
+type: "${t('template.default-type')}"
 subtype: ""
 rarity: ""
 attunement: false
 price: ""
-text_align: "ширина"
+text_align: "${t('template.default-align')}"
 description: |
   
 \`\`\`
@@ -70,11 +74,11 @@ description: |
 
         this.addCommand({
             id: 'open-catalog',
-            name: 'Открыть каталог карточек',
+            name: t('cmd.open-catalog'),
             callback: () => { void this.openCatalog(); }
         });
 
-        // Style `wc:Название` inline code in Reading Mode
+        // Style `wc:Name` inline code in Reading Mode
         this.registerMarkdownPostProcessor((element) => {
             element.querySelectorAll('code').forEach(code => {
                 if (code.textContent && code.textContent.trim().startsWith('wc:')) {
@@ -93,7 +97,7 @@ description: |
                 if (entry) {
                     void this.openCardPreview(entry);
                 } else {
-                    new Notice(`Карточка «${itemName}» не найдена в каталоге`);
+                    new Notice(t('card.not-found', { name: itemName }));
                 }
             };
 

@@ -1,25 +1,27 @@
 import { App, parseYaml, MarkdownRenderer, Component, Notice, setIcon } from 'obsidian';
 import type { MagicItem } from './types';
+import { t } from './i18n';
 
 function getRarityClass(rarity?: string): string {
     if (!rarity) return 'wc-rarity--default';
     const r = rarity.toLowerCase().trim();
-    if (r === 'обычный' || r === 'обычное' || r === 'обычная') return 'wc-rarity--common';
-    if (r === 'необычный' || r === 'необычное' || r === 'необычная') return 'wc-rarity--uncommon';
-    if (r === 'редкий' || r === 'редкое' || r === 'редкая') return 'wc-rarity--rare';
-    if (r.startsWith('очень редк')) return 'wc-rarity--veryrare';
-    if (r === 'легендарный' || r === 'легендарное' || r === 'легендарная') return 'wc-rarity--legendary';
-    if (r === 'артефакт') return 'wc-rarity--artifact';
+    // Support both Russian and English rarity names
+    if (r === 'обычный' || r === 'обычное' || r === 'обычная' || r === 'common') return 'wc-rarity--common';
+    if (r === 'необычный' || r === 'необычное' || r === 'необычная' || r === 'uncommon') return 'wc-rarity--uncommon';
+    if (r === 'редкий' || r === 'редкое' || r === 'редкая' || r === 'rare') return 'wc-rarity--rare';
+    if (r.startsWith('очень редк') || r === 'very rare') return 'wc-rarity--veryrare';
+    if (r === 'легендарный' || r === 'легендарное' || r === 'легендарная' || r === 'legendary') return 'wc-rarity--legendary';
+    if (r === 'артефакт' || r === 'artifact') return 'wc-rarity--artifact';
     return 'wc-rarity--default';
 }
 
 function getPriceCurrencyClass(price?: string): string {
     if (!price) return '';
     const p = price.toLowerCase().trim();
-    if (p.endsWith('зм')) return 'wc-price--gold';
-    if (p.endsWith('см')) return 'wc-price--silver';
-    if (p.endsWith('мм')) return 'wc-price--copper';
-    if (p.endsWith('эм')) return 'wc-price--electrum';
+    if (p.endsWith('зм') || p.endsWith('gp')) return 'wc-price--gold';
+    if (p.endsWith('см') || p.endsWith('sp')) return 'wc-price--silver';
+    if (p.endsWith('мм') || p.endsWith('cp')) return 'wc-price--copper';
+    if (p.endsWith('эм') || p.endsWith('ep')) return 'wc-price--electrum';
     return 'wc-price--gold';
 }
 
@@ -44,7 +46,7 @@ export class CardRenderer {
         try {
             item = parseYaml(source) as MagicItem;
         } catch {
-            el.createEl('div', { text: 'Ошибка парсинга YAML карточки предмета.', cls: 'wc-card-error' });
+            el.createEl('div', { text: t('card.parse-error'), cls: 'wc-card-error' });
             return;
         }
 
@@ -78,7 +80,7 @@ export class CardRenderer {
             
             const addBtn = actionContainer.createEl('div', {
                 cls: `clickable-icon wc-block-action-btn ${options.isInCatalog ? 'wc-block-action-btn--added' : ''}`,
-                attr: { 'aria-label': options.isInCatalog ? 'Удалить из каталога' : 'Добавить в каталог' }
+                attr: { 'aria-label': options.isInCatalog ? t('card.remove-from-catalog') : t('card.add-to-catalog') }
             });
 
             const renderIcon = (isAdded: boolean) => {
@@ -100,29 +102,25 @@ export class CardRenderer {
                         await options.onRemoveFromCatalog(item);
                         isAdded = false;
                         addBtn.classList.remove('wc-block-action-btn--added');
-                        addBtn.setAttribute('aria-label', 'Добавить в каталог');
+                        addBtn.setAttribute('aria-label', t('card.add-to-catalog'));
                         renderIcon(isAdded);
-                        new Notice(`«${item.name}» удалена из каталога`);
+                        new Notice(t('card.removed-notice', { name: item.name }));
                     } else if (!isAdded && options.onAddToCatalog) {
                         await options.onAddToCatalog(item, source);
                         isAdded = true;
                         addBtn.classList.add('wc-block-action-btn--added');
-                        addBtn.setAttribute('aria-label', 'Удалить из каталога');
+                        addBtn.setAttribute('aria-label', t('card.remove-from-catalog'));
                         renderIcon(isAdded);
-                        new Notice(`«${item.name}» добавлена в каталог`);
+                        new Notice(t('card.added-notice', { name: item.name }));
                     }
                 })();
             });
         }
 
-
-        // Top accent bar
-        card.createEl('div', { cls: 'wc-card-accent' });
-
         // Header row
         const headerRow = card.createEl('div', { cls: 'wc-card-header-row' });
         const nameBlock = headerRow.createEl('div', { cls: 'wc-card-name-block' });
-        nameBlock.createEl('div', { text: item.name || 'Неизвестный предмет', cls: 'wc-card-name' });
+        nameBlock.createEl('div', { text: item.name || t('card.unknown-item'), cls: 'wc-card-name' });
         if (item.title_en) {
             nameBlock.createEl('div', { text: `[${item.title_en}]`, cls: 'wc-card-name-en' });
         }
@@ -133,18 +131,14 @@ export class CardRenderer {
         }
 
         // Meta line
-        const typeStr = item.type || 'Чудесный предмет';
+        const typeStr = item.type || t('card.default-type');
         let metaText = typeStr;
         if (item.subtype) metaText += ` (${item.subtype})`;
         if (item.rarity) metaText += `, ${item.rarity}`;
         if (item.attunement === true || String(item.attunement).toLowerCase() === 'true') {
-            metaText += ` (требуется настройка)`;
+            metaText += ` (${t('card.requires-attunement')})`;
         } else if (typeof item.attunement === 'string' && item.attunement.toLowerCase() !== 'false' && item.attunement.trim() !== '') {
-            let att = item.attunement;
-            if (att.toLowerCase().includes('требуется настройка')) {
-                att = att.replace(/Требуется настройка/gi, 'требуется настройка');
-            }
-            metaText += ` (${att})`;
+            metaText += ` (${item.attunement})`;
         }
         card.createEl('div', { text: metaText, cls: 'wc-card-meta' });
 

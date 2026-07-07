@@ -2,6 +2,7 @@ import { ItemView, WorkspaceLeaf, Component } from 'obsidian';
 import type WonderfulCardsPlugin from './main';
 import { CardRenderer } from './CardRenderer';
 import type { CatalogItem } from './types';
+import { t } from './i18n';
 
 export const VIEW_TYPE_CARD_PREVIEW = 'wc-card-preview-view';
 
@@ -19,7 +20,7 @@ export class CardPreviewView extends ItemView {
 
     getViewType(): string { return VIEW_TYPE_CARD_PREVIEW; }
     getDisplayText(): string {
-        return this.catalogItem ? this.catalogItem.item.name : 'Превью карточки';
+        return this.catalogItem ? this.catalogItem.item.name : t('preview.title');
     }
     getIcon(): string { return 'eye'; }
 
@@ -49,7 +50,7 @@ export class CardPreviewView extends ItemView {
         if (this.fromCatalog) {
             const backBtn = container.createEl('button', {
                 cls: 'wc-preview-back-btn',
-                text: '← Назад к каталогу'
+                text: t('preview.back')
             });
             backBtn.addEventListener('click', () => {
                 void this.plugin.openCatalog();

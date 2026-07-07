@@ -31,21 +31,166 @@ var import_obsidian7 = require("obsidian");
 
 // src/CardRenderer.ts
 var import_obsidian = require("obsidian");
+
+// src/i18n.ts
+var currentLang = "en";
+var en = {
+  // Commands
+  "cmd.insert-template": "Insert magic item template",
+  "cmd.open-catalog": "Open card catalog",
+  // Card Renderer
+  "card.parse-error": "Error parsing item card YAML.",
+  "card.add-to-catalog": "Add to catalog",
+  "card.remove-from-catalog": "Remove from catalog",
+  "card.removed-notice": '"{name}" removed from catalog',
+  "card.added-notice": '"{name}" added to catalog',
+  "card.unknown-item": "Unknown item",
+  "card.default-type": "Wondrous item",
+  "card.requires-attunement": "requires attunement",
+  "card.not-found": 'Card "{name}" not found in catalog',
+  // Settings
+  "settings.heading": "Catalog",
+  "settings.add-card": "Add card",
+  "settings.add-card-desc": "Create a new magic item card",
+  "settings.add-btn": "+ Add",
+  "settings.added-notice": '"{name}" added to catalog',
+  "settings.empty": "Catalog is empty. Add your first card!",
+  "settings.edit-btn": "Edit",
+  "settings.updated-notice": '"{name}" updated',
+  "settings.delete-btn": "Delete",
+  "settings.deleted-notice": '"{name}" removed from catalog',
+  "settings.language": "Language / \u042F\u0437\u044B\u043A",
+  "settings.language-desc": "Select the plugin interface language",
+  // Edit Modal
+  "modal.title-edit": "Edit card",
+  "modal.title-new": "New card",
+  "modal.mode-gui": "Interface",
+  "modal.mode-yaml": "YAML",
+  "modal.save": "Save",
+  "modal.cancel": "Cancel",
+  "modal.name-required": "Please enter the item name",
+  "modal.field-name": "Item name",
+  "modal.field-title-en": "English title",
+  "modal.field-image": "Image",
+  "modal.field-type": "Type",
+  "modal.field-subtype": "Subtype",
+  "modal.field-rarity": "Rarity",
+  "modal.field-attunement": "Requires attunement",
+  "modal.field-price": "Price",
+  "modal.field-align": "Text alignment",
+  "modal.field-description": "Description",
+  "modal.align-justify": "Justify",
+  "modal.align-left": "Left",
+  "modal.align-center": "Center",
+  "modal.align-right": "Right",
+  "modal.yaml-error": "YAML parsing error",
+  // Template defaults
+  "template.default-type": "Wondrous item",
+  "template.default-align": "justify",
+  // Catalog View
+  "catalog.title": "Card catalog",
+  "catalog.header": "Item catalog",
+  "catalog.search-placeholder": "Search by name...",
+  "catalog.empty": "Catalog is empty",
+  "catalog.not-found": "Nothing found",
+  // Preview View
+  "preview.title": "Card preview",
+  "preview.back": "\u2190 Back to catalog"
+};
+var ru = {
+  // Commands
+  "cmd.insert-template": "\u0412\u0441\u0442\u0430\u0432\u0438\u0442\u044C \u0448\u0430\u0431\u043B\u043E\u043D \u043C\u0430\u0433\u0438\u0447\u0435\u0441\u043A\u043E\u0433\u043E \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u0430",
+  "cmd.open-catalog": "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u043A\u0430\u0442\u0430\u043B\u043E\u0433 \u043A\u0430\u0440\u0442\u043E\u0447\u0435\u043A",
+  // Card Renderer
+  "card.parse-error": "\u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u0430\u0440\u0441\u0438\u043D\u0433\u0430 YAML \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0438 \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u0430.",
+  "card.add-to-catalog": "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0432 \u043A\u0430\u0442\u0430\u043B\u043E\u0433",
+  "card.remove-from-catalog": "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0438\u0437 \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430",
+  "card.removed-notice": "\xAB{name}\xBB \u0443\u0434\u0430\u043B\u0435\u043D\u0430 \u0438\u0437 \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430",
+  "card.added-notice": "\xAB{name}\xBB \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0430 \u0432 \u043A\u0430\u0442\u0430\u043B\u043E\u0433",
+  "card.unknown-item": "\u041D\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u043D\u044B\u0439 \u043F\u0440\u0435\u0434\u043C\u0435\u0442",
+  "card.default-type": "\u0427\u0443\u0434\u0435\u0441\u043D\u044B\u0439 \u043F\u0440\u0435\u0434\u043C\u0435\u0442",
+  "card.requires-attunement": "\u0442\u0440\u0435\u0431\u0443\u0435\u0442\u0441\u044F \u043D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0430",
+  "card.not-found": "\u041A\u0430\u0440\u0442\u043E\u0447\u043A\u0430 \xAB{name}\xBB \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u0430 \u0432 \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0435",
+  // Settings
+  "settings.heading": "\u041A\u0430\u0442\u0430\u043B\u043E\u0433",
+  "settings.add-card": "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0443",
+  "settings.add-card-desc": "\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u043D\u043E\u0432\u0443\u044E \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0443 \u043C\u0430\u0433\u0438\u0447\u0435\u0441\u043A\u043E\u0433\u043E \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u0430",
+  "settings.add-btn": "+ \u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C",
+  "settings.added-notice": "\xAB{name}\xBB \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0430 \u0432 \u043A\u0430\u0442\u0430\u043B\u043E\u0433",
+  "settings.empty": "\u041A\u0430\u0442\u0430\u043B\u043E\u0433 \u043F\u0443\u0441\u0442. \u0414\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u043F\u0435\u0440\u0432\u0443\u044E \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0443!",
+  "settings.edit-btn": "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C",
+  "settings.updated-notice": "\xAB{name}\xBB \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0430",
+  "settings.delete-btn": "\u0423\u0434\u0430\u043B\u0438\u0442\u044C",
+  "settings.deleted-notice": "\xAB{name}\xBB \u0443\u0434\u0430\u043B\u0435\u043D\u0430 \u0438\u0437 \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430",
+  "settings.language": "\u042F\u0437\u044B\u043A / Language",
+  "settings.language-desc": "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u044F\u0437\u044B\u043A \u0438\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0430 \u043F\u043B\u0430\u0433\u0438\u043D\u0430",
+  // Edit Modal
+  "modal.title-edit": "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0443",
+  "modal.title-new": "\u041D\u043E\u0432\u0430\u044F \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0430",
+  "modal.mode-gui": "\u0418\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441",
+  "modal.mode-yaml": "YAML",
+  "modal.save": "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C",
+  "modal.cancel": "\u041E\u0442\u043C\u0435\u043D\u0430",
+  "modal.name-required": "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u0430",
+  "modal.field-name": "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u0430",
+  "modal.field-title-en": "Item title (\u0410\u043D\u0433\u043B.)",
+  "modal.field-image": "\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435",
+  "modal.field-type": "\u0422\u0438\u043F",
+  "modal.field-subtype": "\u041F\u043E\u0434\u0442\u0438\u043F",
+  "modal.field-rarity": "\u0420\u0435\u0434\u043A\u043E\u0441\u0442\u044C",
+  "modal.field-attunement": "\u0422\u0440\u0435\u0431\u0443\u0435\u0442\u0441\u044F \u043D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0430",
+  "modal.field-price": "\u0426\u0435\u043D\u0430",
+  "modal.field-align": "\u0412\u044B\u0440\u0430\u0432\u043D\u0438\u0432\u0430\u043D\u0438\u0435 \u0442\u0435\u043A\u0441\u0442\u0430",
+  "modal.field-description": "\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435",
+  "modal.align-justify": "\u041F\u043E \u0448\u0438\u0440\u0438\u043D\u0435",
+  "modal.align-left": "\u041F\u043E \u043B\u0435\u0432\u043E\u043C\u0443 \u043A\u0440\u0430\u044E",
+  "modal.align-center": "\u041F\u043E \u0446\u0435\u043D\u0442\u0440\u0443",
+  "modal.align-right": "\u041F\u043E \u043F\u0440\u0430\u0432\u043E\u043C\u0443 \u043A\u0440\u0430\u044E",
+  "modal.yaml-error": "\u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u0430\u0440\u0441\u0438\u043D\u0433\u0430 YAML",
+  // Template defaults
+  "template.default-type": "\u0427\u0443\u0434\u0435\u0441\u043D\u044B\u0439 \u043F\u0440\u0435\u0434\u043C\u0435\u0442",
+  "template.default-align": "\u0448\u0438\u0440\u0438\u043D\u0430",
+  // Catalog View
+  "catalog.title": "\u041A\u0430\u0442\u0430\u043B\u043E\u0433 \u043A\u0430\u0440\u0442\u043E\u0447\u0435\u043A",
+  "catalog.header": "\u041A\u0430\u0442\u0430\u043B\u043E\u0433 \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u043E\u0432",
+  "catalog.search-placeholder": "\u041F\u043E\u0438\u0441\u043A \u043F\u043E \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u044E...",
+  "catalog.empty": "\u041A\u0430\u0442\u0430\u043B\u043E\u0433 \u043F\u0443\u0441\u0442",
+  "catalog.not-found": "\u041D\u0438\u0447\u0435\u0433\u043E \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u043E",
+  // Preview View
+  "preview.title": "\u041F\u0440\u0435\u0432\u044C\u044E \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0438",
+  "preview.back": "\u2190 \u041D\u0430\u0437\u0430\u0434 \u043A \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0443"
+};
+var dictionaries = { en, ru };
+function setLang(lang) {
+  currentLang = lang;
+}
+function t(key, params) {
+  var _a, _b;
+  let str = (_b = (_a = dictionaries[currentLang][key]) != null ? _a : dictionaries["en"][key]) != null ? _b : key;
+  if (params) {
+    for (const [k, v] of Object.entries(params)) {
+      str = str.replace(`{${k}}`, v);
+    }
+  }
+  return str;
+}
+
+// src/CardRenderer.ts
 function getRarityClass(rarity) {
   if (!rarity)
     return "wc-rarity--default";
   const r = rarity.toLowerCase().trim();
-  if (r === "\u043E\u0431\u044B\u0447\u043D\u044B\u0439" || r === "\u043E\u0431\u044B\u0447\u043D\u043E\u0435" || r === "\u043E\u0431\u044B\u0447\u043D\u0430\u044F")
+  if (r === "\u043E\u0431\u044B\u0447\u043D\u044B\u0439" || r === "\u043E\u0431\u044B\u0447\u043D\u043E\u0435" || r === "\u043E\u0431\u044B\u0447\u043D\u0430\u044F" || r === "common")
     return "wc-rarity--common";
-  if (r === "\u043D\u0435\u043E\u0431\u044B\u0447\u043D\u044B\u0439" || r === "\u043D\u0435\u043E\u0431\u044B\u0447\u043D\u043E\u0435" || r === "\u043D\u0435\u043E\u0431\u044B\u0447\u043D\u0430\u044F")
+  if (r === "\u043D\u0435\u043E\u0431\u044B\u0447\u043D\u044B\u0439" || r === "\u043D\u0435\u043E\u0431\u044B\u0447\u043D\u043E\u0435" || r === "\u043D\u0435\u043E\u0431\u044B\u0447\u043D\u0430\u044F" || r === "uncommon")
     return "wc-rarity--uncommon";
-  if (r === "\u0440\u0435\u0434\u043A\u0438\u0439" || r === "\u0440\u0435\u0434\u043A\u043E\u0435" || r === "\u0440\u0435\u0434\u043A\u0430\u044F")
+  if (r === "\u0440\u0435\u0434\u043A\u0438\u0439" || r === "\u0440\u0435\u0434\u043A\u043E\u0435" || r === "\u0440\u0435\u0434\u043A\u0430\u044F" || r === "rare")
     return "wc-rarity--rare";
-  if (r.startsWith("\u043E\u0447\u0435\u043D\u044C \u0440\u0435\u0434\u043A"))
+  if (r.startsWith("\u043E\u0447\u0435\u043D\u044C \u0440\u0435\u0434\u043A") || r === "very rare")
     return "wc-rarity--veryrare";
-  if (r === "\u043B\u0435\u0433\u0435\u043D\u0434\u0430\u0440\u043D\u044B\u0439" || r === "\u043B\u0435\u0433\u0435\u043D\u0434\u0430\u0440\u043D\u043E\u0435" || r === "\u043B\u0435\u0433\u0435\u043D\u0434\u0430\u0440\u043D\u0430\u044F")
+  if (r === "\u043B\u0435\u0433\u0435\u043D\u0434\u0430\u0440\u043D\u044B\u0439" || r === "\u043B\u0435\u0433\u0435\u043D\u0434\u0430\u0440\u043D\u043E\u0435" || r === "\u043B\u0435\u0433\u0435\u043D\u0434\u0430\u0440\u043D\u0430\u044F" || r === "legendary")
     return "wc-rarity--legendary";
-  if (r === "\u0430\u0440\u0442\u0435\u0444\u0430\u043A\u0442")
+  if (r === "\u0430\u0440\u0442\u0435\u0444\u0430\u043A\u0442" || r === "artifact")
     return "wc-rarity--artifact";
   return "wc-rarity--default";
 }
@@ -53,13 +198,13 @@ function getPriceCurrencyClass(price) {
   if (!price)
     return "";
   const p = price.toLowerCase().trim();
-  if (p.endsWith("\u0437\u043C"))
+  if (p.endsWith("\u0437\u043C") || p.endsWith("gp"))
     return "wc-price--gold";
-  if (p.endsWith("\u0441\u043C"))
+  if (p.endsWith("\u0441\u043C") || p.endsWith("sp"))
     return "wc-price--silver";
-  if (p.endsWith("\u043C\u043C"))
+  if (p.endsWith("\u043C\u043C") || p.endsWith("cp"))
     return "wc-price--copper";
-  if (p.endsWith("\u044D\u043C"))
+  if (p.endsWith("\u044D\u043C") || p.endsWith("ep"))
     return "wc-price--electrum";
   return "wc-price--gold";
 }
@@ -69,7 +214,7 @@ var CardRenderer = class {
     try {
       item = (0, import_obsidian.parseYaml)(source);
     } catch (e) {
-      el.createEl("div", { text: "\u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u0430\u0440\u0441\u0438\u043D\u0433\u0430 YAML \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0438 \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u0430.", cls: "wc-card-error" });
+      el.createEl("div", { text: t("card.parse-error"), cls: "wc-card-error" });
       return;
     }
     el.addClass("wc-render-container");
@@ -77,12 +222,14 @@ var CardRenderer = class {
     const card = el.createEl("div", { cls: `wc-card ${rarityClass}` });
     if (!(options == null ? void 0 : options.compact)) {
       const width = item.width && item.width >= 400 ? item.width : 400;
-      card.style.width = `${width}px`;
-      card.style.maxWidth = "100%";
+      card.setCssProps({ "--wc-card-width": `${width}px` });
+      card.addClass("wc-card--custom-width");
     }
     if (options == null ? void 0 : options.onCardClick) {
-      card.style.cursor = "pointer";
+      card.addClass("wc-card--clickable");
       card.addEventListener("click", (e) => {
+        if (e.target.closest(".wc-block-action-btn"))
+          return;
         options.onCardClick(item);
       });
     }
@@ -91,48 +238,42 @@ var CardRenderer = class {
       const actionContainer = el.createEl("div", { cls: "wc-block-action-container" });
       const addBtn = actionContainer.createEl("div", {
         cls: `clickable-icon wc-block-action-btn ${options.isInCatalog ? "wc-block-action-btn--added" : ""}`,
-        attr: { "aria-label": options.isInCatalog ? "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0438\u0437 \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430" : "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0432 \u043A\u0430\u0442\u0430\u043B\u043E\u0433" }
+        attr: { "aria-label": options.isInCatalog ? t("card.remove-from-catalog") : t("card.add-to-catalog") }
       });
       const renderIcon = (isAdded2) => {
+        addBtn.empty();
         if (isAdded2) {
-          addBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>';
+          (0, import_obsidian.setIcon)(addBtn, "check");
         } else {
-          addBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path><line x1="12" y1="7" x2="12" y2="13"></line><line x1="9" y1="10" x2="15" y2="10"></line></svg>';
+          (0, import_obsidian.setIcon)(addBtn, "plus");
         }
       };
       let isAdded = !!options.isInCatalog;
       renderIcon(isAdded);
-      addBtn.addEventListener("click", async (e) => {
-        e.stopPropagation();
-        if (isAdded && options.onRemoveFromCatalog) {
-          await options.onRemoveFromCatalog(item);
-          isAdded = false;
-          addBtn.classList.remove("wc-block-action-btn--added");
-          addBtn.setAttribute("aria-label", "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0432 \u043A\u0430\u0442\u0430\u043B\u043E\u0433");
-          renderIcon(isAdded);
-          new import_obsidian.Notice(`\xAB${item.name}\xBB \u0443\u0434\u0430\u043B\u0435\u043D\u0430 \u0438\u0437 \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430`);
-        } else if (!isAdded && options.onAddToCatalog) {
-          await options.onAddToCatalog(item, source);
-          isAdded = true;
-          addBtn.classList.add("wc-block-action-btn--added");
-          addBtn.setAttribute("aria-label", "\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0438\u0437 \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430");
-          renderIcon(isAdded);
-          new import_obsidian.Notice(`\xAB${item.name}\xBB \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0430 \u0432 \u043A\u0430\u0442\u0430\u043B\u043E\u0433`);
-        }
+      addBtn.addEventListener("click", (e) => {
+        void (async () => {
+          e.stopPropagation();
+          if (isAdded && options.onRemoveFromCatalog) {
+            await options.onRemoveFromCatalog(item);
+            isAdded = false;
+            addBtn.classList.remove("wc-block-action-btn--added");
+            addBtn.setAttribute("aria-label", t("card.add-to-catalog"));
+            renderIcon(isAdded);
+            new import_obsidian.Notice(t("card.removed-notice", { name: item.name }));
+          } else if (!isAdded && options.onAddToCatalog) {
+            await options.onAddToCatalog(item, source);
+            isAdded = true;
+            addBtn.classList.add("wc-block-action-btn--added");
+            addBtn.setAttribute("aria-label", t("card.remove-from-catalog"));
+            renderIcon(isAdded);
+            new import_obsidian.Notice(t("card.added-notice", { name: item.name }));
+          }
+        })();
       });
     }
-    if (options == null ? void 0 : options.onCardClick) {
-      card.style.cursor = "pointer";
-      card.addEventListener("click", (e) => {
-        if (e.target.closest(".wc-card-action-btn"))
-          return;
-        options.onCardClick(item);
-      });
-    }
-    card.createEl("div", { cls: "wc-card-accent" });
     const headerRow = card.createEl("div", { cls: "wc-card-header-row" });
     const nameBlock = headerRow.createEl("div", { cls: "wc-card-name-block" });
-    nameBlock.createEl("div", { text: item.name || "\u041D\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u043D\u044B\u0439 \u043F\u0440\u0435\u0434\u043C\u0435\u0442", cls: "wc-card-name" });
+    nameBlock.createEl("div", { text: item.name || t("card.unknown-item"), cls: "wc-card-name" });
     if (item.title_en) {
       nameBlock.createEl("div", { text: `[${item.title_en}]`, cls: "wc-card-name-en" });
     }
@@ -140,20 +281,16 @@ var CardRenderer = class {
       const currClass = getPriceCurrencyClass(item.price);
       headerRow.createEl("div", { text: item.price, cls: `wc-card-price-badge ${currClass}` });
     }
-    const typeStr = item.type || "\u0427\u0443\u0434\u0435\u0441\u043D\u044B\u0439 \u043F\u0440\u0435\u0434\u043C\u0435\u0442";
+    const typeStr = item.type || t("card.default-type");
     let metaText = typeStr;
     if (item.subtype)
       metaText += ` (${item.subtype})`;
     if (item.rarity)
       metaText += `, ${item.rarity}`;
     if (item.attunement === true || String(item.attunement).toLowerCase() === "true") {
-      metaText += ` (\u0442\u0440\u0435\u0431\u0443\u0435\u0442\u0441\u044F \u043D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0430)`;
+      metaText += ` (${t("card.requires-attunement")})`;
     } else if (typeof item.attunement === "string" && item.attunement.toLowerCase() !== "false" && item.attunement.trim() !== "") {
-      let att = item.attunement;
-      if (att.toLowerCase().includes("\u0442\u0440\u0435\u0431\u0443\u0435\u0442\u0441\u044F \u043D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0430")) {
-        att = att.replace(/Требуется настройка/gi, "\u0442\u0440\u0435\u0431\u0443\u0435\u0442\u0441\u044F \u043D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0430");
-      }
-      metaText += ` (${att})`;
+      metaText += ` (${item.attunement})`;
     }
     card.createEl("div", { text: metaText, cls: "wc-card-meta" });
     if (options == null ? void 0 : options.compact)
@@ -202,7 +339,7 @@ var CatalogStore = class {
   }
   async load() {
     const saved = await this.plugin.loadData();
-    if (saved && saved.catalog) {
+    if (saved == null ? void 0 : saved.catalog) {
       this.data = saved;
     }
   }
@@ -259,6 +396,14 @@ var CatalogStore = class {
       (c) => c.item.name.toLowerCase() === name.toLowerCase()
     );
   }
+  getLang() {
+    var _a;
+    return (_a = this.data.lang) != null ? _a : "en";
+  }
+  async setLang(lang) {
+    this.data.lang = lang;
+    await this.save();
+  }
 };
 
 // src/CatalogView.ts
@@ -275,14 +420,14 @@ var CatalogView = class extends import_obsidian3.ItemView {
     return VIEW_TYPE_CATALOG;
   }
   getDisplayText() {
-    return "\u041A\u0430\u0442\u0430\u043B\u043E\u0433 \u043A\u0430\u0440\u0442\u043E\u0447\u0435\u043A";
+    return t("catalog.title");
   }
   getIcon() {
     return "scroll";
   }
   async onOpen() {
     this.component.load();
-    this.renderView();
+    void this.renderView();
   }
   async onClose() {
     this.component.unload();
@@ -292,16 +437,16 @@ var CatalogView = class extends import_obsidian3.ItemView {
     container.empty();
     container.addClass("wc-catalog-container");
     const header = container.createEl("div", { cls: "wc-catalog-header" });
-    header.createEl("h3", { text: "\u041A\u0430\u0442\u0430\u043B\u043E\u0433 \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u043E\u0432" });
+    header.createEl("h3", { text: t("catalog.header") });
     const searchWrap = header.createEl("div", { cls: "wc-catalog-search-wrap" });
     const searchInput = searchWrap.createEl("input", {
       cls: "wc-catalog-search",
-      attr: { type: "text", placeholder: "\u041F\u043E\u0438\u0441\u043A \u043F\u043E \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u044E..." }
+      attr: { type: "text", placeholder: t("catalog.search-placeholder") }
     });
     searchInput.value = this.searchQuery;
     searchInput.addEventListener("input", () => {
       this.searchQuery = searchInput.value;
-      this.renderGrid(grid);
+      void this.renderGrid(grid);
     });
     const grid = container.createEl("div", { cls: "wc-catalog-grid" });
     await this.renderGrid(grid);
@@ -311,7 +456,7 @@ var CatalogView = class extends import_obsidian3.ItemView {
     const items = this.plugin.catalogStore.search(this.searchQuery);
     if (items.length === 0) {
       grid.createEl("div", {
-        text: this.searchQuery ? "\u041D\u0438\u0447\u0435\u0433\u043E \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u043E" : "\u041A\u0430\u0442\u0430\u043B\u043E\u0433 \u043F\u0443\u0441\u0442",
+        text: this.searchQuery ? t("catalog.not-found") : t("catalog.empty"),
         cls: "wc-catalog-empty"
       });
       return;
@@ -327,7 +472,7 @@ var CatalogView = class extends import_obsidian3.ItemView {
         {
           compact: true,
           onCardClick: () => {
-            this.plugin.openCardPreview(entry, true);
+            void this.plugin.openCardPreview(entry, true);
           }
         }
       );
@@ -353,7 +498,7 @@ var CardPreviewView = class extends import_obsidian4.ItemView {
     return VIEW_TYPE_CARD_PREVIEW;
   }
   getDisplayText() {
-    return this.catalogItem ? this.catalogItem.item.name : "\u041F\u0440\u0435\u0432\u044C\u044E \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0438";
+    return this.catalogItem ? this.catalogItem.item.name : t("preview.title");
   }
   getIcon() {
     return "eye";
@@ -379,10 +524,10 @@ var CardPreviewView = class extends import_obsidian4.ItemView {
     if (this.fromCatalog) {
       const backBtn = container.createEl("button", {
         cls: "wc-preview-back-btn",
-        text: "\u2190 \u041D\u0430\u0437\u0430\u0434 \u043A \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0443"
+        text: t("preview.back")
       });
       backBtn.addEventListener("click", () => {
-        this.plugin.openCatalog();
+        void this.plugin.openCatalog();
       });
     }
     if (this.catalogItem) {
@@ -418,13 +563,13 @@ var CardEditModal = class extends import_obsidian5.Modal {
         name: "",
         title_en: "",
         image: "",
-        type: "\u0427\u0443\u0434\u0435\u0441\u043D\u044B\u0439 \u043F\u0440\u0435\u0434\u043C\u0435\u0442",
+        type: t("card.default-type"),
         subtype: "",
         rarity: "",
         attunement: false,
         price: "",
         description: "",
-        text_align: "\u0448\u0438\u0440\u0438\u043D\u0430"
+        text_align: t("template.default-align")
       };
       this.yamlText = "";
     }
@@ -439,14 +584,14 @@ var CardEditModal = class extends import_obsidian5.Modal {
   render() {
     const { contentEl } = this;
     contentEl.empty();
-    contentEl.createEl("h2", { text: this.editingItem ? "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0443" : "\u041D\u043E\u0432\u0430\u044F \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0430" });
+    contentEl.createEl("h2", { text: this.editingItem ? t("modal.title-edit") : t("modal.title-new") });
     const toggleWrap = contentEl.createEl("div", { cls: "wc-edit-mode-toggle" });
     const guiBtn = toggleWrap.createEl("button", {
-      text: "\u0418\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441",
+      text: t("modal.mode-gui"),
       cls: `wc-edit-mode-btn ${this.mode === "gui" ? "wc-edit-mode-btn--active" : ""}`
     });
     const yamlBtn = toggleWrap.createEl("button", {
-      text: "YAML",
+      text: t("modal.mode-yaml"),
       cls: `wc-edit-mode-btn ${this.mode === "yaml" ? "wc-edit-mode-btn--active" : ""}`
     });
     guiBtn.addEventListener("click", () => {
@@ -469,51 +614,70 @@ var CardEditModal = class extends import_obsidian5.Modal {
     } else {
       this.renderYAML(body);
     }
-    new import_obsidian5.Setting(contentEl).addButton((btn) => btn.setButtonText("\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C").setCta().onClick(() => {
+    new import_obsidian5.Setting(contentEl).addButton((btn) => btn.setButtonText(t("modal.save")).setCta().onClick(() => {
       if (this.mode === "yaml")
         this.syncYamlToItem();
       if (this.mode === "gui")
         this.syncItemToYaml();
       if (!this.item.name) {
-        new import_obsidian5.Notice("\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u0430");
+        new import_obsidian5.Notice(t("modal.name-required"));
         return;
       }
       this.onSave(this.item, this.yamlText);
       this.close();
-    })).addButton((btn) => btn.setButtonText("\u041E\u0442\u043C\u0435\u043D\u0430").onClick(() => this.close()));
+    })).addButton((btn) => btn.setButtonText(t("modal.cancel")).onClick(() => this.close()));
   }
   renderGUI(container) {
-    new import_obsidian5.Setting(container).setName("\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u0430").addText((t) => t.setValue(this.item.name).onChange((v) => {
+    new import_obsidian5.Setting(container).setName(t("modal.field-name")).addText((tx) => tx.setValue(this.item.name).onChange((v) => {
       this.item.name = v;
     }));
-    new import_obsidian5.Setting(container).setName("Item title (\u0410\u043D\u0433\u043B.)").addText((t) => t.setValue(this.item.title_en || "").onChange((v) => {
+    new import_obsidian5.Setting(container).setName(t("modal.field-title-en")).addText((tx) => tx.setValue(this.item.title_en || "").onChange((v) => {
       this.item.title_en = v;
     }));
-    new import_obsidian5.Setting(container).setName("\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435").addText((t) => t.setValue(this.item.image || "").onChange((v) => {
+    new import_obsidian5.Setting(container).setName(t("modal.field-image")).addText((tx) => tx.setValue(this.item.image || "").onChange((v) => {
       this.item.image = v;
     }));
-    new import_obsidian5.Setting(container).setName("\u0422\u0438\u043F").addText((t) => t.setValue(this.item.type).onChange((v) => {
-      this.item.type = v || "\u0427\u0443\u0434\u0435\u0441\u043D\u044B\u0439 \u043F\u0440\u0435\u0434\u043C\u0435\u0442";
+    new import_obsidian5.Setting(container).setName(t("modal.field-type")).addText((tx) => tx.setValue(this.item.type).onChange((v) => {
+      this.item.type = v || t("card.default-type");
     }));
-    new import_obsidian5.Setting(container).setName("\u041F\u043E\u0434\u0442\u0438\u043F").addText((t) => t.setValue(this.item.subtype || "").onChange((v) => {
+    new import_obsidian5.Setting(container).setName(t("modal.field-subtype")).addText((tx) => tx.setValue(this.item.subtype || "").onChange((v) => {
       this.item.subtype = v;
     }));
-    new import_obsidian5.Setting(container).setName("\u0420\u0435\u0434\u043A\u043E\u0441\u0442\u044C").addText((t) => t.setValue(this.item.rarity || "").onChange((v) => {
+    new import_obsidian5.Setting(container).setName(t("modal.field-rarity")).addText((tx) => tx.setValue(this.item.rarity || "").onChange((v) => {
       this.item.rarity = v;
     }));
-    new import_obsidian5.Setting(container).setName("\u0422\u0440\u0435\u0431\u0443\u0435\u0442\u0441\u044F \u043D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0430").addToggle((t) => t.setValue(this.item.attunement === true || String(this.item.attunement).toLowerCase() === "true").onChange((v) => {
+    new import_obsidian5.Setting(container).setName(t("modal.field-attunement")).addToggle((tg) => tg.setValue(this.item.attunement === true || String(this.item.attunement).toLowerCase() === "true").onChange((v) => {
       this.item.attunement = v;
     }));
-    new import_obsidian5.Setting(container).setName("\u0426\u0435\u043D\u0430").addText((t) => t.setValue(this.item.price || "").onChange((v) => {
+    new import_obsidian5.Setting(container).setName(t("modal.field-price")).addText((tx) => tx.setValue(this.item.price || "").onChange((v) => {
       this.item.price = v;
     }));
-    new import_obsidian5.Setting(container).setName("\u0412\u044B\u0440\u0430\u0432\u043D\u0438\u0432\u0430\u043D\u0438\u0435 \u0442\u0435\u043A\u0441\u0442\u0430").addDropdown((d) => d.addOptions({ "\u0448\u0438\u0440\u0438\u043D\u0430": "\u041F\u043E \u0448\u0438\u0440\u0438\u043D\u0435", "\u043B\u0435\u0432\u043E": "\u041F\u043E \u043B\u0435\u0432\u043E\u043C\u0443 \u043A\u0440\u0430\u044E", "\u0446\u0435\u043D\u0442\u0440": "\u041F\u043E \u0446\u0435\u043D\u0442\u0440\u0443", "\u043F\u0440\u0430\u0432\u043E": "\u041F\u043E \u043F\u0440\u0430\u0432\u043E\u043C\u0443 \u043A\u0440\u0430\u044E" }).setValue(this.item.text_align || "\u0448\u0438\u0440\u0438\u043D\u0430").onChange((v) => {
-      this.item.text_align = v;
-    }));
-    new import_obsidian5.Setting(container).setName("\u041E\u043F\u0438\u0441\u0430\u043D\u0438\u0435").addTextArea((t) => {
-      t.inputEl.rows = 10;
-      t.inputEl.addClass("wc-edit-textarea");
-      t.setValue(this.item.description || "").onChange((v) => {
+    new import_obsidian5.Setting(container).setName(t("modal.field-align")).addDropdown((d) => {
+      var _a;
+      const opts = {
+        "justify": t("modal.align-justify"),
+        "left": t("modal.align-left"),
+        "center": t("modal.align-center"),
+        "right": t("modal.align-right")
+      };
+      d.addOptions(opts);
+      const legacyMap = {
+        "\u0448\u0438\u0440\u0438\u043D\u0430": "justify",
+        "\u043B\u0435\u0432\u043E": "left",
+        "\u0446\u0435\u043D\u0442\u0440": "center",
+        "\u043F\u0440\u0430\u0432\u043E": "right"
+      };
+      const currentVal = ((_a = this.item.text_align) == null ? void 0 : _a.toLowerCase().trim()) || "justify";
+      const normalizedVal = legacyMap[currentVal] || currentVal;
+      d.setValue(normalizedVal);
+      d.onChange((v) => {
+        this.item.text_align = v;
+      });
+    });
+    new import_obsidian5.Setting(container).setName(t("modal.field-description")).addTextArea((tx) => {
+      tx.inputEl.rows = 10;
+      tx.inputEl.addClass("wc-edit-textarea");
+      tx.setValue(this.item.description || "").onChange((v) => {
         this.item.description = v;
       });
     });
@@ -537,7 +701,7 @@ var CardEditModal = class extends import_obsidian5.Modal {
       obj.title_en = this.item.title_en;
     if (this.item.image)
       obj.image = this.item.image;
-    obj.type = this.item.type || "\u0427\u0443\u0434\u0435\u0441\u043D\u044B\u0439 \u043F\u0440\u0435\u0434\u043C\u0435\u0442";
+    obj.type = this.item.type || t("card.default-type");
     if (this.item.subtype)
       obj.subtype = this.item.subtype;
     if (this.item.rarity)
@@ -558,7 +722,7 @@ var CardEditModal = class extends import_obsidian5.Modal {
         this.item = { ...this.item, ...parsed };
       }
     } catch (e) {
-      new import_obsidian5.Notice("\u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u0430\u0440\u0441\u0438\u043D\u0433\u0430 YAML");
+      new import_obsidian5.Notice(t("modal.yaml-error"));
     }
   }
 };
@@ -570,38 +734,55 @@ var WonderfulCardsSettingsTab = class extends import_obsidian6.PluginSettingTab 
     this.plugin = plugin;
   }
   display() {
+    this.renderSettings();
+  }
+  renderSettings() {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: "Wonderful Cards \u2014 \u041A\u0430\u0442\u0430\u043B\u043E\u0433" });
-    new import_obsidian6.Setting(containerEl).setName("\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0443").setDesc("\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u043D\u043E\u0432\u0443\u044E \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0443 \u043C\u0430\u0433\u0438\u0447\u0435\u0441\u043A\u043E\u0433\u043E \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u0430").addButton((btn) => btn.setButtonText("+ \u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C").setCta().onClick(() => {
-      new CardEditModal(this.app, this.plugin, null, async (item, yaml) => {
-        await this.plugin.catalogStore.add(item, yaml);
-        new import_obsidian6.Notice(`\xAB${item.name}\xBB \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0430 \u0432 \u043A\u0430\u0442\u0430\u043B\u043E\u0433`);
-        this.display();
+    new import_obsidian6.Setting(containerEl).setName(t("settings.language")).setDesc(t("settings.language-desc")).addDropdown((d) => d.addOptions({ "en": "English", "ru": "\u0420\u0443\u0441\u0441\u043A\u0438\u0439" }).setValue(this.plugin.catalogStore.getLang()).onChange((value) => {
+      void (async () => {
+        const lang = value;
+        setLang(lang);
+        await this.plugin.catalogStore.setLang(lang);
+        this.renderSettings();
+      })();
+    }));
+    new import_obsidian6.Setting(containerEl).setName(t("settings.heading")).setHeading();
+    new import_obsidian6.Setting(containerEl).setName(t("settings.add-card")).setDesc(t("settings.add-card-desc")).addButton((btn) => btn.setButtonText(t("settings.add-btn")).setCta().onClick(() => {
+      new CardEditModal(this.app, this.plugin, null, (item, yaml) => {
+        void (async () => {
+          await this.plugin.catalogStore.add(item, yaml);
+          new import_obsidian6.Notice(t("settings.added-notice", { name: item.name }));
+          this.renderSettings();
+        })();
       }).open();
     }));
     containerEl.createEl("hr");
     const catalog = this.plugin.catalogStore.getAll();
     if (catalog.length === 0) {
       containerEl.createEl("p", {
-        text: "\u041A\u0430\u0442\u0430\u043B\u043E\u0433 \u043F\u0443\u0441\u0442. \u0414\u043E\u0431\u0430\u0432\u044C\u0442\u0435 \u043F\u0435\u0440\u0432\u0443\u044E \u043A\u0430\u0440\u0442\u043E\u0447\u043A\u0443!",
+        text: t("settings.empty"),
         cls: "wc-settings-empty"
       });
       return;
     }
     for (const entry of catalog) {
-      const s = new import_obsidian6.Setting(containerEl).setName(entry.item.name).setDesc(`${entry.item.type || "\u0427\u0443\u0434\u0435\u0441\u043D\u044B\u0439 \u043F\u0440\u0435\u0434\u043C\u0435\u0442"}${entry.item.rarity ? ", " + entry.item.rarity : ""}`);
-      s.addButton((btn) => btn.setButtonText("\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C").onClick(() => {
-        new CardEditModal(this.app, this.plugin, entry, async (item, yaml) => {
-          await this.plugin.catalogStore.update(entry.id, item, yaml);
-          new import_obsidian6.Notice(`\xAB${item.name}\xBB \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0430`);
-          this.display();
+      const s = new import_obsidian6.Setting(containerEl).setName(entry.item.name).setDesc(`${entry.item.type || t("card.default-type")}${entry.item.rarity ? ", " + entry.item.rarity : ""}`);
+      s.addButton((btn) => btn.setButtonText(t("settings.edit-btn")).onClick(() => {
+        new CardEditModal(this.app, this.plugin, entry, (item, yaml) => {
+          void (async () => {
+            await this.plugin.catalogStore.update(entry.id, item, yaml);
+            new import_obsidian6.Notice(t("settings.updated-notice", { name: item.name }));
+            this.renderSettings();
+          })();
         }).open();
       }));
-      s.addButton((btn) => btn.setButtonText("\u0423\u0434\u0430\u043B\u0438\u0442\u044C").setWarning().onClick(async () => {
-        await this.plugin.catalogStore.remove(entry.id);
-        new import_obsidian6.Notice(`\xAB${entry.item.name}\xBB \u0443\u0434\u0430\u043B\u0435\u043D\u0430 \u0438\u0437 \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0430`);
-        this.display();
+      s.addButton((btn) => btn.setButtonText(t("settings.delete-btn")).setDestructive().onClick(() => {
+        void (async () => {
+          await this.plugin.catalogStore.remove(entry.id);
+          new import_obsidian6.Notice(t("settings.deleted-notice", { name: entry.item.name }));
+          this.renderSettings();
+        })();
       }));
     }
   }
@@ -612,6 +793,7 @@ var WonderfulCardsPlugin = class extends import_obsidian7.Plugin {
   async onload() {
     this.catalogStore = new CatalogStore(this);
     await this.catalogStore.load();
+    setLang(this.catalogStore.getLang());
     this.registerView(VIEW_TYPE_CATALOG, (leaf) => new CatalogView(leaf, this));
     this.registerView(VIEW_TYPE_CARD_PREVIEW, (leaf) => new CardPreviewView(leaf, this));
     this.addSettingTab(new WonderfulCardsSettingsTab(this.app, this));
@@ -619,7 +801,7 @@ var WonderfulCardsPlugin = class extends import_obsidian7.Plugin {
       const itemMatch = source.match(/name:\s*["']?([^"'\n]+)["']?/);
       const itemName = itemMatch ? itemMatch[1].trim() : "";
       const isInCatalog = this.catalogStore.has(itemName);
-      CardRenderer.render(this.app, source, el, ctx.sourcePath, this, {
+      void CardRenderer.render(this.app, source, el, ctx.sourcePath, this, {
         isInCatalog,
         onAddToCatalog: async (item, yaml) => {
           await this.catalogStore.add(item, yaml);
@@ -633,27 +815,27 @@ var WonderfulCardsPlugin = class extends import_obsidian7.Plugin {
         onCardClick: (item) => {
           const entry = this.catalogStore.findByName(item.name);
           if (entry) {
-            this.openCardPreview(entry);
+            void this.openCardPreview(entry);
           } else {
-            this.openCardPreview({ id: "temp", item, sourceYaml: source });
+            void this.openCardPreview({ id: "temp", item, sourceYaml: source });
           }
         }
       });
     });
     this.addCommand({
       id: "insert-magic-item-template",
-      name: "\u0412\u0441\u0442\u0430\u0432\u0438\u0442\u044C \u0448\u0430\u0431\u043B\u043E\u043D \u043C\u0430\u0433\u0438\u0447\u0435\u0441\u043A\u043E\u0433\u043E \u043F\u0440\u0435\u0434\u043C\u0435\u0442\u0430",
-      editorCallback: (editor, view) => {
+      name: t("cmd.insert-template"),
+      editorCallback: (editor) => {
         const template = `\`\`\`itemcard
 name: ""
 title_en: ""
 image: ""
-type: "\u0427\u0443\u0434\u0435\u0441\u043D\u044B\u0439 \u043F\u0440\u0435\u0434\u043C\u0435\u0442"
+type: "${t("template.default-type")}"
 subtype: ""
 rarity: ""
 attunement: false
 price: ""
-text_align: "\u0448\u0438\u0440\u0438\u043D\u0430"
+text_align: "${t("template.default-align")}"
 description: |
   
 \`\`\`
@@ -662,9 +844,11 @@ description: |
       }
     });
     this.addCommand({
-      id: "open-wonderful-cards-catalog",
-      name: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u043A\u0430\u0442\u0430\u043B\u043E\u0433 \u043A\u0430\u0440\u0442\u043E\u0447\u0435\u043A",
-      callback: () => this.openCatalog()
+      id: "open-catalog",
+      name: t("cmd.open-catalog"),
+      callback: () => {
+        void this.openCatalog();
+      }
     });
     this.registerMarkdownPostProcessor((element) => {
       element.querySelectorAll("code").forEach((code) => {
@@ -673,15 +857,15 @@ description: |
         }
       });
     });
-    this.registerDomEvent(document, "click", (evt) => {
+    this.registerDomEvent(activeDocument, "click", (evt) => {
       var _a, _b;
       const target = evt.target;
       const triggerPreview = (itemName) => {
         const entry = this.catalogStore.findByName(itemName);
         if (entry) {
-          this.openCardPreview(entry);
+          void this.openCardPreview(entry);
         } else {
-          new Notice(`\u041A\u0430\u0440\u0442\u043E\u0447\u043A\u0430 \xAB${itemName}\xBB \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u0430 \u0432 \u043A\u0430\u0442\u0430\u043B\u043E\u0433\u0435`);
+          new import_obsidian7.Notice(t("card.not-found", { name: itemName }));
         }
       };
       const readingCode = target.closest("code.wc-clickable-code");
@@ -739,7 +923,7 @@ description: |
         return;
       }
     }
-    this.app.workspace.revealLeaf(leaf);
+    await this.app.workspace.revealLeaf(leaf);
   }
   async openCardPreview(entry, fromCatalog = false) {
     let leaf = this.app.workspace.getLeavesOfType(VIEW_TYPE_CARD_PREVIEW)[0];
@@ -752,9 +936,9 @@ description: |
         return;
       }
     }
-    this.app.workspace.revealLeaf(leaf);
+    await this.app.workspace.revealLeaf(leaf);
     if (leaf.view instanceof CardPreviewView) {
-      leaf.view.showCard(entry, fromCatalog);
+      await leaf.view.showCard(entry, fromCatalog);
     }
   }
 };

@@ -1,6 +1,7 @@
 import { App, Modal, Setting, Notice, parseYaml, stringifyYaml } from 'obsidian';
 import type { MagicItem, CatalogItem } from './types';
 import type WonderfulCardsPlugin from './main';
+import { t } from './i18n';
 
 export class CardEditModal extends Modal {
     plugin: WonderfulCardsPlugin;
@@ -22,9 +23,9 @@ export class CardEditModal extends Modal {
         } else {
             this.item = {
                 name: '', title_en: '', image: '',
-                type: 'Чудесный предмет', subtype: '', rarity: '',
+                type: t('card.default-type'), subtype: '', rarity: '',
                 attunement: false, price: '', description: '',
-                text_align: 'ширина'
+                text_align: t('template.default-align')
             };
             this.yamlText = '';
         }
@@ -43,16 +44,16 @@ export class CardEditModal extends Modal {
         const { contentEl } = this;
         contentEl.empty();
 
-        contentEl.createEl('h2', { text: this.editingItem ? 'Редактировать карточку' : 'Новая карточка' });
+        contentEl.createEl('h2', { text: this.editingItem ? t('modal.title-edit') : t('modal.title-new') });
 
         // Mode toggle
         const toggleWrap = contentEl.createEl('div', { cls: 'wc-edit-mode-toggle' });
         const guiBtn = toggleWrap.createEl('button', {
-            text: 'Интерфейс',
+            text: t('modal.mode-gui'),
             cls: `wc-edit-mode-btn ${this.mode === 'gui' ? 'wc-edit-mode-btn--active' : ''}`
         });
         const yamlBtn = toggleWrap.createEl('button', {
-            text: 'YAML',
+            text: t('modal.mode-yaml'),
             cls: `wc-edit-mode-btn ${this.mode === 'yaml' ? 'wc-edit-mode-btn--active' : ''}`
         });
 
@@ -83,54 +84,67 @@ export class CardEditModal extends Modal {
 
         // Buttons
         new Setting(contentEl)
-            .addButton(btn => btn.setButtonText('Сохранить').setCta().onClick(() => {
+            .addButton(btn => btn.setButtonText(t('modal.save')).setCta().onClick(() => {
                 if (this.mode === 'yaml') this.syncYamlToItem();
                 if (this.mode === 'gui') this.syncItemToYaml();
                 if (!this.item.name) {
-                    new Notice('Введите название предмета');
+                    new Notice(t('modal.name-required'));
                     return;
                 }
                 this.onSave(this.item, this.yamlText);
                 this.close();
             }))
-            .addButton(btn => btn.setButtonText('Отмена').onClick(() => this.close()));
+            .addButton(btn => btn.setButtonText(t('modal.cancel')).onClick(() => this.close()));
     }
 
     private renderGUI(container: HTMLElement) {
-        new Setting(container).setName('Название предмета').addText(t =>
-            t.setValue(this.item.name).onChange(v => { this.item.name = v; }));
+        new Setting(container).setName(t('modal.field-name')).addText(tx =>
+            tx.setValue(this.item.name).onChange(v => { this.item.name = v; }));
 
-        new Setting(container).setName('Item title (Англ.)').addText(t =>
-            t.setValue(this.item.title_en || '').onChange(v => { this.item.title_en = v; }));
+        new Setting(container).setName(t('modal.field-title-en')).addText(tx =>
+            tx.setValue(this.item.title_en || '').onChange(v => { this.item.title_en = v; }));
 
-        new Setting(container).setName('Изображение').addText(t =>
-            t.setValue(this.item.image || '').onChange(v => { this.item.image = v; }));
+        new Setting(container).setName(t('modal.field-image')).addText(tx =>
+            tx.setValue(this.item.image || '').onChange(v => { this.item.image = v; }));
 
-        new Setting(container).setName('Тип').addText(t =>
-            t.setValue(this.item.type).onChange(v => { this.item.type = v || 'Чудесный предмет'; }));
+        new Setting(container).setName(t('modal.field-type')).addText(tx =>
+            tx.setValue(this.item.type).onChange(v => { this.item.type = v || t('card.default-type'); }));
 
-        new Setting(container).setName('Подтип').addText(t =>
-            t.setValue(this.item.subtype || '').onChange(v => { this.item.subtype = v; }));
+        new Setting(container).setName(t('modal.field-subtype')).addText(tx =>
+            tx.setValue(this.item.subtype || '').onChange(v => { this.item.subtype = v; }));
 
-        new Setting(container).setName('Редкость').addText(t =>
-            t.setValue(this.item.rarity || '').onChange(v => { this.item.rarity = v; }));
+        new Setting(container).setName(t('modal.field-rarity')).addText(tx =>
+            tx.setValue(this.item.rarity || '').onChange(v => { this.item.rarity = v; }));
 
-        new Setting(container).setName('Требуется настройка').addToggle(t =>
-            t.setValue(this.item.attunement === true || String(this.item.attunement).toLowerCase() === 'true')
+        new Setting(container).setName(t('modal.field-attunement')).addToggle(tg =>
+            tg.setValue(this.item.attunement === true || String(this.item.attunement).toLowerCase() === 'true')
                 .onChange(v => { this.item.attunement = v; }));
 
-        new Setting(container).setName('Цена').addText(t =>
-            t.setValue(this.item.price || '').onChange(v => { this.item.price = v; }));
+        new Setting(container).setName(t('modal.field-price')).addText(tx =>
+            tx.setValue(this.item.price || '').onChange(v => { this.item.price = v; }));
 
-        new Setting(container).setName('Выравнивание текста').addDropdown(d =>
-            d.addOptions({ 'ширина': 'По ширине', 'лево': 'По левому краю', 'центр': 'По центру', 'право': 'По правому краю' })
-                .setValue(this.item.text_align || 'ширина')
-                .onChange(v => { this.item.text_align = v; }));
+        new Setting(container).setName(t('modal.field-align')).addDropdown(d => {
+            const opts: Record<string, string> = {
+                'justify': t('modal.align-justify'),
+                'left': t('modal.align-left'),
+                'center': t('modal.align-center'),
+                'right': t('modal.align-right'),
+            };
+            d.addOptions(opts);
+            // Map legacy RU keys to standard keys
+            const legacyMap: Record<string, string> = {
+                'ширина': 'justify', 'лево': 'left', 'центр': 'center', 'право': 'right'
+            };
+            const currentVal = this.item.text_align?.toLowerCase().trim() || 'justify';
+            const normalizedVal = legacyMap[currentVal] || currentVal;
+            d.setValue(normalizedVal);
+            d.onChange(v => { this.item.text_align = v; });
+        });
 
-        new Setting(container).setName('Описание').addTextArea(t => {
-            t.inputEl.rows = 10;
-            t.inputEl.addClass('wc-edit-textarea');
-            t.setValue(this.item.description || '').onChange(v => { this.item.description = v; });
+        new Setting(container).setName(t('modal.field-description')).addTextArea(tx => {
+            tx.inputEl.rows = 10;
+            tx.inputEl.addClass('wc-edit-textarea');
+            tx.setValue(this.item.description || '').onChange(v => { this.item.description = v; });
         });
     }
 
@@ -151,7 +165,7 @@ export class CardEditModal extends Modal {
         if (this.item.name) obj.name = this.item.name;
         if (this.item.title_en) obj.title_en = this.item.title_en;
         if (this.item.image) obj.image = this.item.image;
-        obj.type = this.item.type || 'Чудесный предмет';
+        obj.type = this.item.type || t('card.default-type');
         if (this.item.subtype) obj.subtype = this.item.subtype;
         if (this.item.rarity) obj.rarity = this.item.rarity;
         obj.attunement = this.item.attunement === true || String(this.item.attunement).toLowerCase() === 'true';
@@ -168,7 +182,7 @@ export class CardEditModal extends Modal {
                 this.item = { ...this.item, ...parsed };
             }
         } catch {
-            new Notice('Ошибка парсинга YAML');
+            new Notice(t('modal.yaml-error'));
         }
     }
 }

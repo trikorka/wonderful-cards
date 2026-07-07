@@ -1,6 +1,7 @@
 import { ItemView, WorkspaceLeaf, Component } from 'obsidian';
 import type WonderfulCardsPlugin from './main';
 import { CardRenderer } from './CardRenderer';
+import { t } from './i18n';
 
 export const VIEW_TYPE_CATALOG = 'wc-catalog-view';
 
@@ -16,7 +17,7 @@ export class CatalogView extends ItemView {
     }
 
     getViewType(): string { return VIEW_TYPE_CATALOG; }
-    getDisplayText(): string { return 'Каталог карточек'; }
+    getDisplayText(): string { return t('catalog.title'); }
     getIcon(): string { return 'scroll'; }
 
     async onOpen() {
@@ -35,13 +36,13 @@ export class CatalogView extends ItemView {
 
         // Header
         const header = container.createEl('div', { cls: 'wc-catalog-header' });
-        header.createEl('h3', { text: 'Каталог предметов' });
+        header.createEl('h3', { text: t('catalog.header') });
 
         // Search
         const searchWrap = header.createEl('div', { cls: 'wc-catalog-search-wrap' });
         const searchInput = searchWrap.createEl('input', {
             cls: 'wc-catalog-search',
-            attr: { type: 'text', placeholder: 'Поиск по названию...' }
+            attr: { type: 'text', placeholder: t('catalog.search-placeholder') }
         });
         searchInput.value = this.searchQuery;
         searchInput.addEventListener('input', () => {
@@ -60,7 +61,7 @@ export class CatalogView extends ItemView {
 
         if (items.length === 0) {
             grid.createEl('div', {
-                text: this.searchQuery ? 'Ничего не найдено' : 'Каталог пуст',
+                text: this.searchQuery ? t('catalog.not-found') : t('catalog.empty'),
                 cls: 'wc-catalog-empty'
             });
             return;

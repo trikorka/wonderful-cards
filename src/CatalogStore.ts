@@ -1,5 +1,6 @@
 import { parseYaml } from 'obsidian';
 import type { MagicItem, CatalogItem, PluginData } from './types';
+import type { Lang } from './i18n';
 import type WonderfulCardsPlugin from './main';
 
 function generateId(): string {
@@ -83,5 +84,14 @@ export class CatalogStore {
         return this.data.catalog.some(c =>
             c.item.name.toLowerCase() === name.toLowerCase()
         );
+    }
+
+    getLang(): Lang {
+        return this.data.lang ?? 'en';
+    }
+
+    async setLang(lang: Lang): Promise<void> {
+        this.data.lang = lang;
+        await this.save();
     }
 }

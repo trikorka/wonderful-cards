@@ -20,4 +20,5 @@ export interface CatalogItem {
 
 export interface PluginData {
     catalog: CatalogItem[];
+    lang?: 'ru' | 'en';
 }
